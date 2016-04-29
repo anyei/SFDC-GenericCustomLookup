@@ -1,0 +1,49 @@
+<apex:page controller="GenericCustomLookupController" setup="false" sidebar="false"  showheader="false" showChat="false">
+<script type='text/javascript'>
+    //window.onblur=function(){self.close();};
+ function pickRecord(o){
+      var ro = eval("(" + o + ")");
+     console.log(ro);
+      window.top.opener.getLookupValue("{!Caller}",ro );
+      window.top.close();
+   
+ }
+
+</script>
+<apex:sectionHeader title="{!objectLabel}" subtitle="Lookup" description="You can use '*' as a wildcard next to other characters to improve your search results"/>
+<apex:form >
+<apex:outputLabel style="font-weight:bold" value="Search" ></apex:outputLabel> <apex:inputText id="searchQuery" value="{!SearchQueryString}" /> <apex:commandButton id="btnSearch" value="Go!" action="{!doSearch}"/>
+</apex:form>
+<apex:pageblock >
+<apex:pageblockSection columns="1">
+    <apex:pageblocksectionitem >
+            <apex:outputPanel >
+                 <table class='list'>
+      
+                    <tr>
+                      <apex:Repeat value="{!FieldKeys}" var="k">
+                        <th class="zen-deemphasize">{!FieldsToDisplay[k.rawColumnName]}</th>
+                     </apex:Repeat> 
+                   </tr>
+                  <apex:Repeat value="{!Records}" var="r">
+                                <tr class="dataRow even">                                 
+                                    
+                                     <apex:Repeat value="{!FieldKeys}" var="k">
+                                         <td class="dataCell"><apex:outputText value="{!if(k.isReference,r.record[k.leftSide][k.rightSide],r.record[k.leftSide])}" rendered="{! k.rawColumnName != actionField}" /><apex:outputPanel rendered="{! k.rawColumnName == actionField}"  >
+                                            
+                                             <a href="javascript:void(0);" onclick="javascript:pickRecord( '{!r.jsonObj}')"  >{!r.record[actionField]}</a>
+                                             </apex:outputPanel></td>
+                                     </apex:Repeat> 
+                               </tr>
+                </apex:Repeat>
+             
+                </table>
+            </apex:outputPanel>
+    </apex:pageblocksectionitem>
+    
+
+    
+
+</apex:pageblocksection>
+</apex:pageblock>
+</apex:page>

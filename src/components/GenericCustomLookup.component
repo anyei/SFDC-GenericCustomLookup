@@ -1,0 +1,106 @@
+<apex:component controller="GenericCustomLookupComponentController" >
+    <script type="text/javascript">
+    if(window.OpenWindowCustomOPener !== "function")
+        function OpenWindowCustomOPener(){
+            var txtValue =  document.querySelectorAll('[id$="{!ID}__panel_fields"] input[type="text"]')[0].value;
+            
+            var w = window.open("/apex/GenericCustomLookupPage?caller={!ID}&q="+txtValue+"&columns={!Columns}&columnsL={!ColumnLabels}&sf={!SearchColumn}&af={!ActionColumn}&type={!SObjectType}{! IF( not(ISNULL(Filter)) && not(isblank(Filter)), '&' + Filter, '')} ", "ContactLookup", "height=600,width=600,menubar=false,resizable=false,status=false,scrollbars=yes,titlebar=false,toolbar=false");            
+             w.focus();
+             return false;
+          }
+    if(window.getLookupValue !== "function"){
+          function getLookupValue(caller,o){
+              
+                   if("{!ValueField}".indexOf('.') > -1){
+                       var leftAndright = "{!ValueField}".split('.');                       
+                      document.querySelectorAll('[id$="{!ID}__panel_fields"] input[type="hidden"]')[0].value = o[leftAndright[0]][leftAndright[1]];                       
+                       }else{
+                        
+                          document.querySelectorAll('[id$="{!ID}__panel_fields"] input[type="hidden"]')[0].value = o["{!ValueField}"];                       
+                         }
+              
+                       Visualforce.remoting.Manager.invokeAction(
+                                    '{!$RemoteAction.GenericCustomLookupComponentController.getText}',
+                                    document.querySelectorAll('[id$="{!ID}__panel_fields"] input[type="hidden"]')[0].value, 
+                                    function(result, event){
+                                        if (event.status) {
+                                            document.querySelectorAll('[id$="{!ID}__panel_fields"] input[type="text"]')[0].value = result;
+                                        } else if (event.type === 'exception') {
+                                            document.getElementById("{!ID}_errors").innerHTML = 
+                                                event.message + "<br/>\n<pre>" + event.where + "</pre>";
+                                        } else {
+                                            document.getElementById("{!ID}_errors").innerHTML = event.message;
+                                        }
+                                    }, 
+                                    {escape: true}
+                                );
+              
+                  var cb="{!callback}";
+                 if(cb != "")
+                     {
+                         try
+                        {       window[cb](caller,o);
+                         }catch(e){}
+                     }
+              
+              }
+     }
+    
+    if(window.clearHidden !== "function"){
+        function clearHidden(){
+              document.querySelectorAll('[id$="{!ID}__panel_fields"] input[type="hidden"]')[0].value='';
+            }
+    }
+    </script>
+    <apex:attribute description="Columns to display in the results" name="Columns" type="String" required="yes"></apex:attribute>
+    <apex:attribute description="Columns labels, this will avoid to describe the sobject to get the columns label, it also makes possible to put any label you want." type="String" name="ColumnLabels" required="false"></apex:attribute>
+    <apex:attribute description="Column by which the search will work upon" name="SearchColumn" type="String" required="yes"></apex:attribute>
+    <apex:attribute description="Column where the link will appear" name="ActionColumn" type="String" required="yes"></apex:attribute>
+    <apex:attribute description="SObject to get the data from" name="SObjectType" type="String" required="yes"></apex:attribute>
+    <apex:attribute description="Filter to norrow down the data" name="Filter" type="string" required="yes"></apex:attribute>
+    <apex:attribute description="Target Field to update" name="ObjectProperty" type="object" required="false" assignTo="{!ValueId}"></apex:attribute>
+    <apex:attribute description="Columns to return in the callback when a record is selected" type="String" name="ColumnsReturned" required="false"></apex:attribute>
+    <apex:attribute description="Field where the value should be placed" name="ValueField" required="yes" type="String" ></apex:attribute>    
+    <apex:attribute description="ID of the component" name="ID" required="yes" type="string" ></apex:attribute>
+    <apex:attribute description="Component Label" name="Label" required="yes" type="string"></apex:attribute>
+    <apex:attribute description="Callback function" name="callback" required="false" type="string"></apex:attribute>
+    
+    <apex:attribute description="" name="TextProperty" type="object" required="false"></apex:attribute>
+    <apex:attribute description="" name="Required" type="boolean" required="false"></apex:attribute>
+              <div id="{!ID}__panel_fields" >
+                
+                <apex:outputPanel >
+                    <apex:inputHidden value="{!ObjectProperty}"   /> 
+                   <label class="labelCol">{!HTMLENCODE(Label)}</label>
+                    <img class="helpOrb" src="/s.gif" title="{!Label}"/>
+                                </apex:outputPanel>  
+                    <apex:inputText label="{!Label}"  required="{!Required}" value="{!Text}" onchange="javascript:clearHidden();" ></apex:inputText>
+                
+                  
+                    <img src="/s.gif" class="lookupIcon" onclick="OpenWindowCustomOPener();" style="maring-top:4px" />
+               
+      </div>
+    <div id="{!ID}_errors">
+    
+    </div>   
+    <script type="text/javascript">
+     
+           Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.GenericCustomLookupComponentController.getText}',
+                '{!ValueId}', 
+                function(result, event){
+                    if (event.status) {
+                        document.querySelectorAll('[id$="{!ID}__panel_fields"] input[type="text"]')[0].value = result;
+                    } else if (event.type === 'exception') {
+                        document.getElementById("{!ID}_errors").innerHTML = 
+                            event.message + "<br/>\n<pre>" + event.where + "</pre>";
+                    } else {
+                        document.getElementById("{!ID}_errors").innerHTML = event.message;
+                    }
+                }, 
+                {escape: true}
+            );
+ 
+
+    </script>
+</apex:component>
