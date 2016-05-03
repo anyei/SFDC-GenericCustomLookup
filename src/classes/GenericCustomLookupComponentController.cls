@@ -1,3 +1,8 @@
+/*
+Author: Angel Robles (anyei)
+Purpose : Controller for GenericCustomLookup visualforce component
+
+*/
 global class GenericCustomLookupComponentController {
    
 
