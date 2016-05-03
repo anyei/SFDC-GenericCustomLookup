@@ -12,11 +12,12 @@
           function getLookupValue(caller,o){
               
                    if("{!ValueField}".indexOf('.') > -1){
-                       var leftAndright = "{!ValueField}".split('.');                       
-                      document.querySelectorAll('[id$="{!ID}__panel_fields"] input[type="hidden"]')[0].value = o[leftAndright[0]][leftAndright[1]];                       
+                       var leftAndright = "{!CustomOrgPrefix}{!ValueField}".split('.');                       
+                      document.querySelectorAll('[id$="{!ID}__panel_fields"] input[type="hidden"]')[0].value = o[leftAndright[0]]['{!CustomOrgPrefix}' + leftAndright[1]];                       
                        }else{
                         
-                          document.querySelectorAll('[id$="{!ID}__panel_fields"] input[type="hidden"]')[0].value = o["{!ValueField}"];                       
+                          document.querySelectorAll('[id$="{!ID}__panel_fields"] input[type="hidden"]')[0].value = o["{!CustomOrgPrefix}{!ValueField}"];                       
+                           
                          }
               
                        Visualforce.remoting.Manager.invokeAction(
