@@ -22,6 +22,10 @@ public class GenericCustomLookupController{
     public list<string> columnsReturnedList{get;set;}
     public List<RecordWrapper> records {get;set;}
     
+    public string CustomOrgPrefix  {get { string prfixWR = new PageReference('/apex/').getUrl(); if(prFixwR.contains('__')) return prFixwR.substringBefore('__').substringAfterLast('/')+'__'; else return '';  }}
+   
+    
+    
     public GenericCustomLookupController(){
          records = new List<RecordWrapper>();
          FieldsToDisplay = new Map<string,string>();
@@ -53,26 +57,31 @@ public class GenericCustomLookupController{
         
     
         if(columnsLabels == null || columnsLabels == ''){
+            
+            
+            
             if(LookupSObjectType != null && LookupSObjectType != ''){
-                Schema.SObjectType sType= Schema.getGlobalDescribe().get(LookupSObjectType);
-                Schema.DescribesObjectResult result =stype.getDescribe();
+                 
+                Schema.SObjectType sType= Schema.getGlobalDescribe().get(CustomOrgPrefix+LookupSObjectType);
+                Schema.DescribesObjectResult result =stype.getDescribe();                
                 objectLabel = result.getLabel();
                 Map<string,Schema.SObjectField> allFields = result.fields.getMap();
                 
                 for(string f : columnsToDisplay.split(',')){
-                    if(allFields.containsKey(f)){
-                        Schema.SObjectField fieldDefinition =allFields.get(f);
+                    if(  (f=='name' && allFields.containsKey('name')) || (f!='name' && allFields.containsKey(CustomOrgPrefix+f)) ){
+                        Schema.SObjectField fieldDefinition =allFields.get( (f=='name' ? 'name' : CustomOrgPrefix+f) );
                         Schema.DescribeFieldResult fr =FieldDefinition.getDescribe();
                         
-                        FieldsToDisplay.put(f,fr.getLabel());
+                        FieldsToDisplay.put((f=='name' ? 'name' : CustomOrgPrefix+f ),fr.getLabel());
                     }
                 }
                 
                 FieldKeys = new List<KeyWrapper>();
                 for(string s : FieldsToDisplay.keyset()){
                  KeyWrapper kw = new KeyWrapper();
-                    kw.leftSide = s;
-                    kw.RawColumnName = s;
+                    
+                    kw.leftSide = (s=='name'? 'name' : s);
+                    kw.RawColumnName = (s=='name'? 'name' : s);
                    FieldKeys.add(kw);
                 }
             }
@@ -100,7 +109,7 @@ public class GenericCustomLookupController{
         
         if(columnsReturned != null && columnsReturned != ''){
             for(string s : columnsReturned.split(',')){
-                columnsReturnedList.add(s);
+                columnsReturnedList.add( (s=='name' ? 'name' : CustomOrgPrefix+s));
             }
         }
         if(columnsReturnedList.size() <=0){            
@@ -108,7 +117,7 @@ public class GenericCustomLookupController{
             for(integer i=0;i<FieldKeys.size();i++)
                 columnsReturnedList.add(fieldKeys[i].leftside);
         }
-        
+       
         
         if(FieldKeys.size() > 0)
              getResults();
@@ -124,13 +133,24 @@ public class GenericCustomLookupController{
         if(additionalFilters.size() > 0){
             for(string s:additionalFilters.keySet()){
                 string valueType = 'string';
+                 try{
+                    id i = id.valueof(additionalFilters.get(s).tolowercase());
+                    valueType = 'id';
+                }catch(exception e){}
+                
+                try{
+                    integer i = integer.valueof(additionalFilters.get(s).tolowercase());
+                    valueType = 'int';
+                }catch(exception e){}
+                
                 try{
                     set<string> booleans = new set<string> {'true','false'};
                    if(booleans.contains(additionalFilters.get(s).tolowercase()))
                       valueType = 'bool';
                 }catCh(exception e){}
-                if(valueType == 'bool')
-                    additionalFiltersString += ' and ' + s + ' = '+additionalFilters.get(s);
+                
+                if(valueType != 'string' && valueType != 'id')
+                    additionalFiltersString += ' and ' + s + ' = '+additionalFilters.get(s);               
                 else
                 additionalFiltersString += ' and ' + s + ' = \''+additionalFilters.get(s)+'\''; 
             }            
