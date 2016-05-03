@@ -22,7 +22,7 @@ Just place the custom component under the "apex:form" tag, assign the require pr
 
 ```
 <apex:form>
-</apex:pageBlockSection>
+<apex:pageBlockSection>
      <apex:pageblocksectionitem >
           <c:GenericCustomLookup ID="Product" 
                                       Label="Products" 
