@@ -21,26 +21,19 @@ You may manually create the apex classes first within your org and then the visu
 Just place the custom component under the "apex:form" tag, assign the require properties.
 
 ```
-<apex:form>
-<apex:pageBlockSection>
-     <apex:pageblocksectionitem >
-          <c:GenericCustomLookup ID="Product" 
-                                      Label="Products" 
-                                      Columns="Product2.Name,Product2.ProductCode" 
-                                      ColumnLabels="Family,Code,Id" 
-                                      ActionColumn="Product2.Name" 
-                                      SearchColumn="Product2.Name" 
-                                      SObjectType="PricebookEntry" 
-                                      ValueField="Product2.Id"                                  
-                                      Filter="f1=Pricebook2id&fv1={!customObject__c.pricebookid__c}&f2=IsActive&fv2=true"
-                                      ObjectProperty="{!customObject__c.Product__c}"                                      
-                                 	  required="true"
-                                 />
- </apex:pageblocksectionitem> 
-</apex:pageBlockSection>
+<apex:page standardController="CustomObject__c" >
+    
+    
+    
+    
+       <c:GenericRelatedList Fields="Field1__c,Field2__c" 
+                             Condition="RecordTypeId='Some_Specific_RecordTypeid' and CustoMObject__c='{!CustomObject__c.id}'" 
+                             SObjectType="CustomObjectRelated__c" 
+                             HeaderTitle="Related Records"></c:GenericRelatedList>
 
-</apex:pageBlock>
-</apex:form>
+    
+  
+</apex:page>
 ```
 
 
