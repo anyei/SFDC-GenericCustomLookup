@@ -4,7 +4,7 @@
         function OpenWindowCustomOPener(){
             var txtValue =  document.querySelectorAll('[id$="{!ID}__panel_fields"] input[type="text"]')[0].value;
             
-            var w = window.open("/apex/GenericCustomLookupPage?caller={!ID}&q="+txtValue+"&columns={!Columns}&columnsL={!ColumnLabels}&sf={!SearchColumn}&af={!ActionColumn}&type={!SObjectType}{! IF( not(ISNULL(Filter)) && not(isblank(Filter)), '&' + Filter, '')} ", "ContactLookup", "height=600,width=600,menubar=false,resizable=false,status=false,scrollbars=yes,titlebar=false,toolbar=false");            
+            var w = window.open("/apex/GenericCustomLookupPage?caller={!ID}&q="+txtValue+"&columns={!Columns}&columnsL={!ColumnLabels}&vf={!ValueField}&sf={!SearchColumn}&af={!ActionColumn}&type={!SObjectType}{! IF( not(ISNULL(Filter)) && not(isblank(Filter)), '&' + Filter, '')} ", "ContactLookup", "height=600,width=600,menubar=false,resizable=false,status=false,scrollbars=yes,titlebar=false,toolbar=false");            
              w.focus();
              return false;
           }
