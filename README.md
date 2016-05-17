@@ -26,7 +26,7 @@ Just place the custom component under the "apex:form" tag, assign the require pr
      <apex:pageblocksectionitem >
           <c:GenericCustomLookup ID="Product" 
                                       Label="Products" 
-                                      Columns="Product2.Name,Product2.ProductCode,Product2.Id" 
+                                      Columns="Product2.Name,Product2.ProductCode" 
                                       ColumnLabels="Family,Code,Id" 
                                       ActionColumn="Product2.Name" 
                                       SearchColumn="Product2.Name" 
