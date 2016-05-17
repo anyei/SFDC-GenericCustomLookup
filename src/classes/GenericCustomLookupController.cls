@@ -13,6 +13,7 @@ public class GenericCustomLookupController{
     public string Caller{get;set;}  
     public string searchField {get;set;}
     public string actionField {get;set;}
+    public string valueField {get;set;}
     public Map<string,string> additionalFilters {get;set;}
     public string columnsToDisplay {get;set;}
     public string columnsLabels {get;set;}
@@ -35,10 +36,12 @@ public class GenericCustomLookupController{
          Caller = ApexPages.currentPage().getParameters().get('caller'); 
          searchField = ApexPages.currentPage().getParameters().get('sf');
          actionField = ApexPages.currentPage().getParameters().get('af');
+         valueField = ApexPages.currentPage().getParameters().get('vf');
         
          columnsToDisplay =ApexPages.currentPage().getParameters().get('columns');
          columnsLabels = ApexPages.currentPage().getParameters().get('columnsL');
          columnsReturned = ApexPages.currentPage().getParameters().get('columnsR');
+         
         
          string q = ApexPages.currentPage().getParameters().get('q');
          if(!string.isEmpty(q) && !string.isblank(q) && q != null)
@@ -164,7 +167,7 @@ public class GenericCustomLookupController{
                       s= s.replace('*','%');
                s=s.replace('\'','');       
               
-        string qs = 'select ' +columnsToDisplay + ' from '+ LookupSObjectType + ' where ('+ searchField + ' like \'%'+s+'%\' )  ' + (additionalFilters.size() > 0 ? additionalFiltersString : '') + ' limit 1000';
+        string qs = 'select ' + columnsToDisplay +(  (valueField != null && valueField != '') ? (!columnsToDisplay.contains(valueField) ? ','+valueField : '') : '' )+ ' from '+ LookupSObjectType + ' where ('+ searchField + ' like \'%'+s+'%\' )  ' + (additionalFilters.size() > 0 ? additionalFiltersString : '') + ' limit 1000';
         
        records.clear();
         for(Sobject o : (List<sobject>)database.query(qs)){            
